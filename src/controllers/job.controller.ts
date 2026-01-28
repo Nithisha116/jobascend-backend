@@ -5,32 +5,19 @@ import {
   getJobsByRecruiterService,
   getJobByIdService,
   updateJobService,
-  deleteJobService,
+  deleteJobService
 } from "../services/job.service";
 
-// ===================== CREATE JOB =====================
 export const createJob = async (req: Request, res: Response) => {
   try {
-    const { title, company, recruiterId } = req.body;
-
-    if (!title || !company || !recruiterId) {
-      return res.status(400).json({
-        success: false,
-        message: "Title, company and recruiter ID are required",
-      });
-    }
-
     const job = await createJobService(req.body);
-
-    res.status(201).json({ success: true, job });
+    res.json({ success: true, job });
   } catch (err: any) {
     res.status(400).json({ success: false, message: err.message });
   }
 };
 
-
-// ===================== GET ALL JOBS =====================
-export const getAllJobs = async (req: Request, res: Response) => {
+export const getAllJobs = async (_req: Request, res: Response) => {
   try {
     const jobs = await getAllJobsService();
     res.json({ success: true, jobs });
@@ -39,57 +26,42 @@ export const getAllJobs = async (req: Request, res: Response) => {
   }
 };
 
-// ===================== GET RECRUITER'S JOBS =====================
 export const getMyJobs = async (req: Request, res: Response) => {
   try {
-    const recruiterId = req.params.id;
+    const recruiterId = req.params.id as string;
     const jobs = await getJobsByRecruiterService(recruiterId);
-
     res.json({ success: true, jobs });
   } catch (err: any) {
     res.status(500).json({ success: false, message: err.message });
   }
 };
 
-// ===================== GET SINGLE JOB =====================
 export const getJobById = async (req: Request, res: Response) => {
   try {
-    const job = await getJobByIdService(req.params.id);
-    if (!job)
-      return res.status(404).json({ success: false, message: "Job not found" });
-
+    const jobId = req.params.id as string;
+    const job = await getJobByIdService(jobId);
     res.json({ success: true, job });
   } catch (err: any) {
-    res.status(404).json({ success: false, message: "Job not found" });
+    res.status(404).json({ success: false, message: err.message });
   }
 };
 
-// ===================== UPDATE JOB =====================
 export const updateJob = async (req: Request, res: Response) => {
   try {
-    const updatedJob = await updateJobService(req.params.id, req.body);
-
+    const jobId = req.params.id as string;
+    const updatedJob = await updateJobService(jobId, req.body);
     res.json({ success: true, job: updatedJob });
   } catch (err: any) {
     res.status(400).json({ success: false, message: err.message });
   }
 };
 
-// ===================== DELETE JOB =====================
 export const deleteJob = async (req: Request, res: Response) => {
   try {
-    const jobId = req.params.id;
-
-    const deleted = await deleteJobService(jobId);
-
-    if (!deleted) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Job not found" });
-    }
-
-    res.json({ success: true, message: "Job deleted successfully" });
+    const jobId = req.params.id as string;
+    await deleteJobService(jobId);
+    res.json({ success: true, message: "Job deleted" });
   } catch (err: any) {
-    res.status(500).json({ success: false, message: err.message });
+    res.status(400).json({ success: false, message: err.message });
   }
 };

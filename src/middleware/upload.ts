@@ -1,12 +1,15 @@
 import multer from "multer";
+import { Request } from "express";
 
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
+  destination: (req: Request, file: Express.Multer.File, cb) => {
     cb(null, "uploads/");
   },
-  filename: (req, file, cb) => {
+  filename: (req: Request, file: Express.Multer.File, cb) => {
     cb(null, Date.now() + "-" + file.originalname);
-  },
+  }
 });
 
-export const upload = multer({ storage });
+const upload = multer({ storage });
+
+export default upload;
